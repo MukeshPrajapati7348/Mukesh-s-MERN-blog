@@ -1,32 +1,46 @@
 import React, { useState } from "react";
-import { json, Link } from "react-router-dom";
-import { Button, Label, TextInput } from "flowbite-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  signInFailure,
+  signInStart,
+  signInSuccess,
+} from "../redux/userReducer/userSlice";
 
 export default function Signin() {
   const [formData, setFormData] = useState({});
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading, error: errorMessage } = useSelector((state) => state.user);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
-    console.log(formData);
+    setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!formData.email || !formData.password) {
-      alert("All fields are mandatory");
-      return;
+      return dispatch(signInFailure("Please fill all the fields."));
     }
 
     try {
-      let response = await fetch("/api/auth/sign-in", {
+      dispatch(signInStart());
+      let data = await fetch("/api/auth/sign-in", {
         method: "post",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(formData),
       });
-      response = response.json();
-      console.log(formData);
+      data = await data.json();
+
+      if (data.flag) {
+        dispatch(signInSuccess(data));
+        navigate("/");
+      } else {
+        dispatch(signInFailure(data.errorMessage));
+      }
     } catch (error) {
-      console.log(error);
+      dispatch(signInFailure(error.errorMessage));
     }
   };
 
@@ -59,7 +73,6 @@ export default function Signin() {
               <TextInput
                 type="email"
                 placeholder="Email"
-                value={formData.email}
                 id="email"
                 onChange={handleChange}
               />
@@ -69,14 +82,24 @@ export default function Signin() {
               <TextInput
                 type="password"
                 placeholder="Password"
-                value={formData.password}
                 id="password"
                 onChange={handleChange}
               />
             </div>
 
-            <Button gradientDuoTone="purpleToPink" type="submit">
-              Sign in
+            <Button
+              gradientDuoTone="purpleToPink"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Spinner size="sm" />
+                  <span className="pl-5">Loading...</span>
+                </>
+              ) : (
+                "Sign in"
+              )}
             </Button>
             <div className="flex justify-center gap-3">
               <span className="text-slate-600">Don't have an account? </span>
@@ -84,6 +107,11 @@ export default function Signin() {
                 Sign up
               </Link>
             </div>
+            {errorMessage && (
+              <Alert className="mt-5" color="failure">
+                {errorMessage}
+              </Alert>
+            )}
           </form>
         </div>
       </div>
