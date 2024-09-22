@@ -7,6 +7,7 @@ import {
   signInStart,
   signInSuccess,
 } from "../redux/userReducer/userSlice";
+import GoogleOAuth from "../components/GoogleOAuth";
 
 export default function Signin() {
   const [formData, setFormData] = useState({});
@@ -34,7 +35,7 @@ export default function Signin() {
       data = await data.json();
 
       if (data.flag) {
-        dispatch(signInSuccess(data));
+        dispatch(signInSuccess(data.brandingDetails));
         navigate("/");
       } else {
         dispatch(signInFailure(data.errorMessage));
@@ -101,6 +102,7 @@ export default function Signin() {
                 "Sign in"
               )}
             </Button>
+            <GoogleOAuth />
             <div className="flex justify-center gap-3">
               <span className="text-slate-600">Don't have an account? </span>
               <Link to="/sign-up" className="text-blue-500">
