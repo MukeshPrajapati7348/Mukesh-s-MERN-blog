@@ -17,9 +17,7 @@ const signup = async (req, res, next) => {
 
   try {
     await newUser.save();
-    return res
-      .status(201)
-      .json({ message: "User registered successfully.", flag: true });
+    return res.status(201).json({ flag: true });
   } catch (error) {
     console.log(error);
 
@@ -57,7 +55,6 @@ const signin = async (req, res, next) => {
       .status(200)
       .cookie("access_token", token, { httpOnly: true })
       .json({
-        message: "User signed in successfully",
         flag: true,
         brandingDetails: restUserDetails,
       });
@@ -83,7 +80,6 @@ const googleAuth = async (req, res, next) => {
         .status(200)
         .cookie("access_token", token, { httpOnly: true })
         .json({
-          message: "User signed in successfully",
           flag: true,
           brandingDetails: restUserDetails,
         });
@@ -112,7 +108,6 @@ const googleAuth = async (req, res, next) => {
         .status(200)
         .cookie("access_token", token, { httpOnly: true })
         .json({
-          message: "User signed in successfully",
           flag: true,
           brandingDetails: restUserDetails,
         });
