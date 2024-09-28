@@ -1,5 +1,6 @@
-import { Alert, Button, TextInput, Spinner } from "flowbite-react";
+import { Alert, Button, TextInput, Spinner, Modal } from "flowbite-react";
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getDownloadURL,
@@ -14,7 +15,11 @@ import {
   updateUserStart,
   updateUserFailure,
   updateUserSuccess,
+  deleteUserFailure,
+  deleteUserSuccess,
+  deleteUserStart,
 } from "../redux/userReducer/userSlice.js";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 
 function DashboardProfile() {
   const { currentUser } = useSelector((state) => state.user);
@@ -28,11 +33,13 @@ function DashboardProfile() {
   const [userUpdateSuccess, setUserUpdateSuccess] = useState(null);
   const [userUpdateNoChange, setUserUpdateNoChange] = useState(null);
   const [userImageURL, setUserImageURL] = useState(null);
+  const [openModal, setOpenModal] = useState(null);
   const [fileUploadProgress, setFileUploadProgress] = useState(null);
   const [fileUploadError, setFileUploadError] = useState(null);
   const { loading, error: errorMessage } = useSelector((state) => state.user);
   const fileRef = useRef();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleImageUpdate = (e) => {
     const file = e.target.files[0];
@@ -143,6 +150,28 @@ function DashboardProfile() {
     }
   };
 
+  const handleAccountDelete = async () => {
+    setOpenModal(false);
+    dispatch(deleteUserStart());
+
+    try {
+      let data = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "delete",
+      });
+
+      data = await data.json();
+
+      if (data.flag) {
+        dispatch(deleteUserSuccess());
+        navigate("/sign-in");
+      } else {
+        dispatch(deleteUserFailure(data.errorMessage));
+      }
+    } catch (error) {
+      dispatch(deleteUserFailure(error.errorMessage));
+    }
+  };
+
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
       <h1 className="my-7 text-center font-semibold text-3xl">Profile</h1>
@@ -221,7 +250,9 @@ function DashboardProfile() {
           )}
         </Button>
         <div className="text-red-500 flex justify-between mt-5">
-          <span className="cursor-pointer">Delete Account</span>
+          <span className="cursor-pointer" onClick={() => setOpenModal(true)}>
+            Delete Account
+          </span>
           <span className="cursor-pointer">Sign out</span>
         </div>
       </form>
@@ -235,6 +266,31 @@ function DashboardProfile() {
         <Alert color="failure">{userUpdateNoChange}</Alert>
       )}
       {imageUploading && <Alert color="failure">{imageUploading}</Alert>}
+
+      <Modal
+        show={openModal}
+        size="md"
+        onClose={() => setOpenModal(false)}
+        popup
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              Are you sure you want to delete this Account?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button color="failure" onClick={handleAccountDelete}>
+                {"Yes, I'm sure"}
+              </Button>
+              <Button color="gray" onClick={() => setOpenModal(false)}>
+                No, cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }
