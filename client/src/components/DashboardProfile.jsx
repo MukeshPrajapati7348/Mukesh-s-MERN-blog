@@ -1,4 +1,4 @@
-import { Alert, Button, TextInput } from "flowbite-react";
+import { Alert, Button, TextInput, Spinner } from "flowbite-react";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -11,8 +11,9 @@ import { app } from "../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import {
-  signInSuccess,
-  signInFailure,
+  updateUserStart,
+  updateUserFailure,
+  updateUserSuccess,
 } from "../redux/userReducer/userSlice.js";
 
 function DashboardProfile() {
@@ -20,12 +21,16 @@ function DashboardProfile() {
   const [userDetails, setUserDetails] = useState({
     username: currentUser.username,
     email: currentUser.email,
+    profilePic: currentUser.profilePic,
   });
   const [userImageFile, setUserImageFile] = useState(null);
+  const [imageUploading, setImageUploading] = useState(null);
+  const [userUpdateSuccess, setUserUpdateSuccess] = useState(null);
+  const [userUpdateNoChange, setUserUpdateNoChange] = useState(null);
   const [userImageURL, setUserImageURL] = useState(null);
   const [fileUploadProgress, setFileUploadProgress] = useState(null);
   const [fileUploadError, setFileUploadError] = useState(null);
-  const [updateResponseError, setUpdateResponseError] = useState(null);
+  const { loading, error: errorMessage } = useSelector((state) => state.user);
   const fileRef = useRef();
   const dispatch = useDispatch();
 
@@ -58,7 +63,7 @@ function DashboardProfile() {
     //     }
     //   }
     // }
-
+    setImageUploading("Please wait until image upload completed");
     setFileUploadError(null);
     const storage = getStorage(app);
     const fileName = new Date().getTime() + userImageFile.name;
@@ -76,11 +81,14 @@ function DashboardProfile() {
         setFileUploadError("Could not upload the image (size can be max 2MB)");
         setUserImageFile(null);
         setUserImageURL(null);
+        setImageUploading(null);
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setUserImageURL(downloadURL);
+          setUserDetails({ ...userDetails, profilePic: downloadURL });
           setUserImageFile(null);
+          setImageUploading(null);
         });
       }
     );
@@ -90,36 +98,55 @@ function DashboardProfile() {
     setUserDetails({ ...userDetails, [e.target.name]: e.target.value });
   };
 
+  const checkUserDetailsChange = () => {
+    if (
+      userDetails.username === currentUser.username &&
+      userDetails.email === currentUser.email &&
+      (!userDetails.password || !userDetails.password.trim()) &&
+      userDetails.profilePic === currentUser.profilePic
+    ) {
+      return false;
+    }
+    return true;
+  };
+
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
-    setUpdateResponseError(null);
+    setUserUpdateSuccess(null);
+    setUserUpdateNoChange(null);
+
+    if (!checkUserDetailsChange()) {
+      setUserUpdateNoChange("No changes to update");
+      return;
+    }
+    dispatch(updateUserStart());
 
     try {
-      let response = await fetch(`/api/user/update/${currentUser._id}`, {
+      let data = await fetch(`/api/user/update/${currentUser._id}`, {
         method: "put",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           ...userDetails,
-          profilePic: userImageURL || currentUser.profilePic,
         }),
       });
 
-      response = await response.json();
+      data = await data.json();
 
-      if (response.flag) {
-        dispatch(signInSuccess(response.userDetails));
+      if (data.flag) {
+        setUserUpdateSuccess("User updated successfully");
+        dispatch(updateUserSuccess(data.userDetails));
       } else {
-        dispatch(signInFailure("Could not update the user"));
+        dispatch(updateUserFailure(data.errorMessage));
       }
     } catch (error) {
-      alert(error);
+      dispatch(updateUserFailure(error.errorMessage));
     }
   };
 
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
       <h1 className="my-7 text-center font-semibold text-3xl">Profile</h1>
-      <form className="flex flex-col" onSubmit={handleProfileUpdate}>
+      <form className="flex flex-col mb-2" onSubmit={handleProfileUpdate}>
         <input
           type="file"
           accept="/image/*"
@@ -129,7 +156,7 @@ function DashboardProfile() {
         />
         <div
           className={`relative w-32 h-32 self-center cursor-pointer shadow-md overflow-hidden rounded-full ${
-            fileUploadProgress && fileUploadProgress < 100 && "opacity-60"
+            fileUploadProgress && fileUploadProgress < 100 && "opacity-50"
           }`}
           onClick={() => fileRef.current.click()}
         >
@@ -160,9 +187,7 @@ function DashboardProfile() {
         </div>
         <div className="flex flex-col gap-4 my-6">
           {fileUploadError && <Alert color="failure">{fileUploadError}</Alert>}
-          {updateResponseError && (
-            <Alert color="failure">{updateResponseError}</Alert>
-          )}
+
           <TextInput
             type="text"
             placeholder="username"
@@ -185,21 +210,31 @@ function DashboardProfile() {
             onChange={handleInputChange}
           />
         </div>
-        <Button
-          type="submit"
-          gradientDuoTone="purpleToBlue"
-          outline
-          disabled={
-            !userDetails.username && !userDetails.email && !userDetails.password
-          }
-        >
-          Update
+        <Button type="submit" gradientDuoTone="purpleToBlue" outline>
+          {loading ? (
+            <>
+              <Spinner size="sm" />
+              <span className="pl-5">Loading...</span>
+            </>
+          ) : (
+            "Update"
+          )}
         </Button>
         <div className="text-red-500 flex justify-between mt-5">
           <span className="cursor-pointer">Delete Account</span>
           <span className="cursor-pointer">Sign out</span>
         </div>
       </form>
+      {errorMessage && (
+        <Alert color="failure" className="mb-1">
+          {errorMessage}
+        </Alert>
+      )}
+      {userUpdateSuccess && <Alert color="success">{userUpdateSuccess}</Alert>}
+      {userUpdateNoChange && (
+        <Alert color="failure">{userUpdateNoChange}</Alert>
+      )}
+      {imageUploading && <Alert color="failure">{imageUploading}</Alert>}
     </div>
   );
 }
