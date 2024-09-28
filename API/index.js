@@ -4,6 +4,7 @@ import userRouter from "./routes/user.routes.js";
 import authRouter from "./routes/auth.routes.js";
 import mongoose from "mongoose";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 //Dotenv configuration for later use
 dotenv.config();
@@ -15,6 +16,7 @@ const app = express();
 //To parse the request body
 app.use(express.json());
 // app.use(cors());
+app.use(cookieParser());
 
 //MongoDB connection
 mongoose

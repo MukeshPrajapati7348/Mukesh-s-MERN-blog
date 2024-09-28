@@ -1,6 +1,6 @@
 import { Alert, Button, TextInput } from "flowbite-react";
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   getDownloadURL,
   getStorage,
@@ -10,14 +10,24 @@ import {
 import { app } from "../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import {
+  signInSuccess,
+  signInFailure,
+} from "../redux/userReducer/userSlice.js";
 
 function DashboardProfile() {
   const { currentUser } = useSelector((state) => state.user);
+  const [userDetails, setUserDetails] = useState({
+    username: currentUser.username,
+    email: currentUser.email,
+  });
   const [userImageFile, setUserImageFile] = useState(null);
   const [userImageURL, setUserImageURL] = useState(null);
   const [fileUploadProgress, setFileUploadProgress] = useState(null);
   const [fileUploadError, setFileUploadError] = useState(null);
+  const [updateResponseError, setUpdateResponseError] = useState(null);
   const fileRef = useRef();
+  const dispatch = useDispatch();
 
   const handleImageUpdate = (e) => {
     const file = e.target.files[0];
@@ -76,7 +86,35 @@ function DashboardProfile() {
     );
   };
 
-  const handleProfileUpdate = () => {};
+  const handleInputChange = (e) => {
+    setUserDetails({ ...userDetails, [e.target.name]: e.target.value });
+  };
+
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    setUpdateResponseError(null);
+
+    try {
+      let response = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: "put",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          ...userDetails,
+          profilePic: userImageURL || currentUser.profilePic,
+        }),
+      });
+
+      response = await response.json();
+
+      if (response.flag) {
+        dispatch(signInSuccess(response.userDetails));
+      } else {
+        dispatch(signInFailure("Could not update the user"));
+      }
+    } catch (error) {
+      alert(error);
+    }
+  };
 
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
@@ -122,25 +160,39 @@ function DashboardProfile() {
         </div>
         <div className="flex flex-col gap-4 my-6">
           {fileUploadError && <Alert color="failure">{fileUploadError}</Alert>}
+          {updateResponseError && (
+            <Alert color="failure">{updateResponseError}</Alert>
+          )}
           <TextInput
             type="text"
             placeholder="username"
-            id="username"
-            defaultValue={currentUser.username}
+            name="username"
+            defaultValue={userDetails.username}
+            onChange={handleInputChange}
           />
           <TextInput
             type="email"
             placeholder="email"
-            id="email"
-            defaultValue={currentUser.email}
+            name="email"
+            defaultValue={userDetails.email}
+            onChange={handleInputChange}
           />
           <TextInput
             type="password"
             placeholder="password"
-            defaultValue="******************"
+            name="password"
+            defaultValue=""
+            onChange={handleInputChange}
           />
         </div>
-        <Button type="submit" gradientDuoTone="purpleToBlue" outline>
+        <Button
+          type="submit"
+          gradientDuoTone="purpleToBlue"
+          outline
+          disabled={
+            !userDetails.username && !userDetails.email && !userDetails.password
+          }
+        >
           Update
         </Button>
         <div className="text-red-500 flex justify-between mt-5">

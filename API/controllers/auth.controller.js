@@ -55,7 +55,7 @@ const signin = async (req, res, next) => {
 
     return res
       .status(200)
-      .cookie("access-token", token, { httpOnly: true })
+      .cookie("access_token", token, { httpOnly: true })
       .json({
         message: "User signed in successfully",
         flag: true,
@@ -81,7 +81,7 @@ const googleAuth = async (req, res, next) => {
 
       return res
         .status(200)
-        .cookie("access-token", token, { httpOnly: true })
+        .cookie("access_token", token, { httpOnly: true })
         .json({
           message: "User signed in successfully",
           flag: true,
@@ -110,7 +110,7 @@ const googleAuth = async (req, res, next) => {
 
       return res
         .status(200)
-        .cookie("access-token", token, { httpOnly: true })
+        .cookie("access_token", token, { httpOnly: true })
         .json({
           message: "User signed in successfully",
           flag: true,
