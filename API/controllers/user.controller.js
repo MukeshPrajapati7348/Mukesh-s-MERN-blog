@@ -73,16 +73,22 @@ const deleteUser = async (req, res, next) => {
   }
 
   try {
-    const deletedUser = await User.findByIdAndDelete(req.params.userId);
+    await User.findByIdAndDelete(req.params.userId);
 
-    if (deletedUser) {
-      return res.status(200).cookie("access_token", "").json({
-        flag: true,
-      });
-    }
+    return res.status(200).json({
+      flag: true,
+    });
   } catch (error) {
     next(error);
   }
 };
 
-export { updateUser, deleteUser };
+const userSignout = (req, res, next) => {
+  try {
+    res.clearCookie("access_token").status(200).json({ flag: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { updateUser, deleteUser, userSignout };
