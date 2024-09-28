@@ -4,7 +4,7 @@ import bcryptjs from "bcryptjs";
 
 const updateUser = async (req, res, next) => {
   if (req.user.id != req.params.userId) {
-    return next(errorHandler(401, "You are not authorized to update"));
+    return next(errorHandler(401, "You are not authorized to update the user"));
   }
 
   const { username, email, password, profilePic } = req.body;
@@ -63,4 +63,25 @@ const updateUser = async (req, res, next) => {
   }
 };
 
-export default updateUser;
+const deleteUser = async (req, res, next) => {
+  if (req.user.id != req.params.userId) {
+    return next(
+      errorHandler(401, "You are not authorized to delete the account")
+    );
+  }
+
+  try {
+    const deletedUser = await User.findByIdAndDelete(req.params.userId);
+
+    if (deletedUser) {
+      return res.status(200).cookie("access_token", "").json({
+        message: "User deleted successfully",
+        flag: true,
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { updateUser, deleteUser };
