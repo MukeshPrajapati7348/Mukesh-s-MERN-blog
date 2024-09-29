@@ -24,14 +24,16 @@ import {
 import { app } from "../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import { useNavigate } from "react-router-dom";
 
 function CreateBlog() {
   const [blogFormData, setBlogFormData] = useState({});
   const [file, setFile] = useState(null);
   const [fileUploadProgress, setFileUploadProgress] = useState(null);
   const [fileUploadError, setFileUploadError] = useState(null);
-  const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.blog);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setBlogFormData({ ...blogFormData, [e.target.name]: e.target.value });
@@ -95,7 +97,7 @@ function CreateBlog() {
 
       if (data.flag) {
         dispatch(blogCreateSuccess(data.blog));
-        console.log("Blog created!");
+        navigate(`/post/${data.blog.slug}`);
       } else {
         dispatch(blogCreateFailure(data.errorMessage));
       }
