@@ -3,9 +3,14 @@ import userReducer from "./userReducer/userSlice";
 import storage from "redux-persist/lib/storage";
 import persistStore from "redux-persist/es/persistStore";
 import { persistReducer } from "redux-persist";
-import themeRedcuer from "./theme/themeSlice";
+import themeReducer from "./theme/themeSlice";
+import blogReducer from "./blogReducer/blogSlice";
 
-const rootReducer = combineReducers({ user: userReducer, theme: themeRedcuer });
+const rootReducer = combineReducers({
+  user: userReducer,
+  theme: themeReducer,
+  blog: blogReducer,
+});
 
 const persistConfig = {
   key: "root",

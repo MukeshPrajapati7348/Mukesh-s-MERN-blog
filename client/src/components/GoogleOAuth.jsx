@@ -30,7 +30,6 @@ function GoogleOAuth() {
       });
       data = await data.json();
 
-      console.log(data);
       if (data.flag) {
         dispatch(signInSuccess(data.brandingDetails));
         navigate("/");

@@ -1,6 +1,5 @@
 import { Alert, Button, TextInput, Spinner, Modal } from "flowbite-react";
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getDownloadURL,
@@ -18,8 +17,10 @@ import {
   deleteUserFailure,
   deleteUserSuccess,
   deleteUserStart,
+  SignoutUserSuccess,
 } from "../redux/userReducer/userSlice.js";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { Link } from "react-router-dom";
 
 function DashboardProfile() {
   const { currentUser } = useSelector((state) => state.user);
@@ -39,7 +40,6 @@ function DashboardProfile() {
   const { loading, error: errorMessage } = useSelector((state) => state.user);
   const fileRef = useRef();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const handleImageUpdate = (e) => {
     const file = e.target.files[0];
@@ -172,6 +172,22 @@ function DashboardProfile() {
     }
   };
 
+  const handleUserSignout = async () => {
+    try {
+      let data = await fetch("/api/user/signout", {
+        method: "post",
+      });
+
+      data = await data.json();
+
+      if (data.flag) {
+        dispatch(SignoutUserSuccess());
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
       <h1 className="my-7 text-center font-semibold text-3xl">Profile</h1>
@@ -249,13 +265,26 @@ function DashboardProfile() {
             "Update"
           )}
         </Button>
-        <div className="text-red-500 flex justify-between mt-5">
-          <span className="cursor-pointer" onClick={() => setOpenModal(true)}>
-            Delete Account
-          </span>
-          <span className="cursor-pointer">Sign out</span>
-        </div>
+        {currentUser.isAdmin && (
+          <Link to="/create-blog">
+            <Button
+              type="submit"
+              gradientDuoTone="purpleToPink"
+              className="mt-4 w-full"
+            >
+              Create a blog
+            </Button>
+          </Link>
+        )}
       </form>
+      <div className="text-red-500 flex justify-between mt-2">
+        <span className="cursor-pointer" onClick={() => setOpenModal(true)}>
+          Delete Account
+        </span>
+        <span className="cursor-pointer" onClick={handleUserSignout}>
+          Sign Out
+        </span>
+      </div>
       {errorMessage && (
         <Alert color="failure" className="mb-1">
           {errorMessage}

@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import userRouter from "./routes/user.routes.js";
 import authRouter from "./routes/auth.routes.js";
+import blogRouter from "./routes/Blog.routes.js";
 import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -29,6 +30,7 @@ mongoose
 //Router to handle all the requests
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/blog", blogRouter);
 
 //midleware to hance errors
 app.use((error, req, res, next) => {
