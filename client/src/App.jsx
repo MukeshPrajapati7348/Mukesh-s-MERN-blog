@@ -8,6 +8,8 @@ import Header from "./components/Header";
 import Projects from "./pages/Projects";
 import FooterComp from "./components/Footer";
 import PrivateRoutes from "./components/PrivateRoutes";
+import CreateBlog from "./pages/CreateBlog";
+import AdminRoutes from "./components/AdminRoutes";
 
 function App() {
   return (
@@ -22,6 +24,9 @@ function App() {
         <Route path="/sign-up" element={<Signup />} />
         <Route path="/sign-in" element={<Signin />} />
         <Route path="/projects" element={<Projects />} />
+        <Route element={<AdminRoutes />}>
+          <Route path="/create-blog" element={<CreateBlog />} />
+        </Route>
       </Routes>
       <FooterComp />
     </BrowserRouter>

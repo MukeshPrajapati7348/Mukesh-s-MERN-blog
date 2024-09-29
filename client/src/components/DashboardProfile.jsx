@@ -20,6 +20,7 @@ import {
   SignoutUserSuccess,
 } from "../redux/userReducer/userSlice.js";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { Link } from "react-router-dom";
 
 function DashboardProfile() {
   const { currentUser } = useSelector((state) => state.user);
@@ -264,15 +265,26 @@ function DashboardProfile() {
             "Update"
           )}
         </Button>
-        <div className="text-red-500 flex justify-between mt-5">
-          <span className="cursor-pointer" onClick={() => setOpenModal(true)}>
-            Delete Account
-          </span>
-          <span className="cursor-pointer" onClick={handleUserSignout}>
-            Sign Out
-          </span>
-        </div>
+        {currentUser.isAdmin && (
+          <Link to="/create-blog">
+            <Button
+              type="submit"
+              gradientDuoTone="purpleToPink"
+              className="mt-4 w-full"
+            >
+              Create a blog
+            </Button>
+          </Link>
+        )}
       </form>
+      <div className="text-red-500 flex justify-between mt-2">
+        <span className="cursor-pointer" onClick={() => setOpenModal(true)}>
+          Delete Account
+        </span>
+        <span className="cursor-pointer" onClick={handleUserSignout}>
+          Sign Out
+        </span>
+      </div>
       {errorMessage && (
         <Alert color="failure" className="mb-1">
           {errorMessage}
