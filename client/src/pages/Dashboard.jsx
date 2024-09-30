@@ -23,14 +23,10 @@ export default function Dashboard() {
         <DashboardSidebar />
       </div>
       {/* profile data */}
-      {tab === "profile" && (
-        <div className="w-full">
-          <DashboardProfile />
-        </div>
-      )}
-      <div className="w-full flex justify-start">
-        {tab === "posts" && <Blogs />}
-      </div>
+      {tab === "profile" && <DashboardProfile />}
+      {/* <div className="w-full flex justify-center"> */}
+      {tab === "posts" && <Blogs />}
+      {/* </div> */}
     </div>
   );
 }
