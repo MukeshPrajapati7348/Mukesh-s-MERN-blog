@@ -75,4 +75,17 @@ const getBlogs = async (req, res, next) => {
   }
 };
 
-export { createBlog, getBlogs };
+const deleteBlog = async (req, res, next) => {
+  if (!req.user.isAdmin || req.user.id !== req.params.userId) {
+    return next(errorHandler(403, "You are not allowed to delete this blog"));
+  }
+
+  try {
+    await Blog.findByIdAndDelete(req.params.blogId);
+    return res.status(200).json({ flag: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { createBlog, getBlogs, deleteBlog };
