@@ -163,7 +163,7 @@ function Blogs() {
                     </Table.Cell>
                     <Table.Cell>
                       <Link
-                        to={`/blog/${blog._id}`}
+                        to={`/update-blog/${blog._id}`}
                         className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
                       >
                         Edit
