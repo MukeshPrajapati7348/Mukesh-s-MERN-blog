@@ -84,20 +84,16 @@ function DashboardUsers() {
     setOpenModal(false);
 
     try {
-      const data = await fetch(
-        `/api/user/delete/${deleteUserId}/${currentUser._id}`,
-        {
-          method: "delete",
-        }
-      );
-      const { flag } = await data.json();
+      const data = await fetch(`/api/user/delete-users/${deleteUserId}`, {
+        method: "delete",
+      });
+      const { flag, errorMessage } = await data.json();
 
       if (flag) {
         toast.success("User deleted successfully");
-
         setUsers((prev) => prev.filter((user) => user._id !== deleteUserId));
       } else {
-        toast.error(error.errorMessage);
+        toast.error(errorMessage);
       }
     } catch (error) {
       toast.error(error.errorMessage);
