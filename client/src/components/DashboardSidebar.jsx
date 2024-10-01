@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Sidebar } from "flowbite-react";
 import { Link, useLocation } from "react-router-dom";
-import { HiArrowSmRight, HiDocumentText, HiUser } from "react-icons/hi";
+import {
+  HiArrowSmRight,
+  HiDocumentText,
+  HiUser,
+  HiUsers,
+} from "react-icons/hi";
 import { SignoutUserSuccess } from "../redux/userReducer/userSlice";
 import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 function DashboardSidebar() {
   const [tab, setTab] = useState("");
@@ -28,10 +34,11 @@ function DashboardSidebar() {
       data = await data.json();
 
       if (data.flag) {
+        toast.success("Signed out successfully");
         dispatch(SignoutUserSuccess());
       }
     } catch (error) {
-      console.log(error);
+      toast.error(error.errorMessage);
     }
   };
 
@@ -51,15 +58,22 @@ function DashboardSidebar() {
             </Sidebar.Item>
           </Link>
           {currentUser.isAdmin && (
-            <Link to="/dashboard?tab=posts">
-              <Sidebar.Item
-                active={tab === "posts"}
-                icon={HiDocumentText}
-                as="div"
-              >
-                Posts
-              </Sidebar.Item>
-            </Link>
+            <>
+              <Link to="/dashboard?tab=blogs">
+                <Sidebar.Item
+                  active={tab === "blogs"}
+                  icon={HiDocumentText}
+                  as="div"
+                >
+                  Blogs
+                </Sidebar.Item>
+              </Link>
+              <Link to="/dashboard?tab=users">
+                <Sidebar.Item active={tab === "users"} icon={HiUsers} as="div">
+                  Users
+                </Sidebar.Item>
+              </Link>
+            </>
           )}
           <Sidebar.Item
             icon={HiArrowSmRight}

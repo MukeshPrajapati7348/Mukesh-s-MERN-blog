@@ -19,13 +19,12 @@ import { app } from "../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function CreateBlog() {
   const [blogFormData, setBlogFormData] = useState({});
   const [file, setFile] = useState(null);
   const [fileUploadProgress, setFileUploadProgress] = useState(null);
-  const [fileUploadError, setFileUploadError] = useState(null);
-  const [blogUpdateError, setBlogUpdateError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -39,11 +38,9 @@ function CreateBlog() {
 
   const handleFileUpload = async () => {
     if (!file) {
-      setFileUploadError("Please select an image");
+      toast.error("Please select an image");
       return;
     }
-
-    setFileUploadError(null);
 
     try {
       const storage = getStorage(app);
@@ -59,21 +56,19 @@ function CreateBlog() {
           setFileUploadProgress(progress.toFixed(0));
         },
         (error) => {
-          setFileUploadError("Image upload failed");
+          toast.error("Image upload failed");
           setFileUploadProgress(null);
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setBlogFormData({ ...blogFormData, blogImage: downloadURL });
             setFileUploadProgress(null);
-            setFileUploadError(null);
           });
         }
       );
     } catch (error) {
-      console.log(error);
       setFileUploadProgress(null);
-      setFileUploadError("Image upload failed");
+      toast.error(error);
     }
   };
 
@@ -90,13 +85,14 @@ function CreateBlog() {
       setLoading(false);
 
       if (data.flag) {
+        toast.success("Blog created successfully");
         navigate(`/blog/${data.blog.slug}`);
       } else {
-        setBlogUpdateError(data.errorMessage);
+        toast.error(data.errorMessage);
       }
     } catch (error) {
       setLoading(false);
-      setBlogUpdateError(error.errorMessage);
+      toast.error(error.errorMessage);
     }
   };
 
@@ -146,7 +142,6 @@ function CreateBlog() {
             )}
           </Button>
         </div>
-        {fileUploadError && <Alert color="failure">{fileUploadError}</Alert>}
         {blogFormData.blogImage && (
           <img
             src={blogFormData.blogImage}
@@ -173,11 +168,6 @@ function CreateBlog() {
           )}
         </Button>
       </form>
-      {blogUpdateError && (
-        <Alert color="failure" className="mt-4">
-          {blogUpdateError}
-        </Alert>
-      )}
     </div>
   );
 }

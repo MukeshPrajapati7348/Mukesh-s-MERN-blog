@@ -11,11 +11,13 @@ import PrivateRoutes from "./components/PrivateRoutes";
 import CreateBlog from "./pages/CreateBlog";
 import AdminRoutes from "./components/AdminRoutes";
 import UpdateBlog from "./pages/UpdateBlog";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
     <BrowserRouter>
       <Header />
+      <Toaster containerClassName="go4109123758" />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />

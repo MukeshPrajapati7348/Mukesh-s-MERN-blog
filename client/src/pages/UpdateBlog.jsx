@@ -19,6 +19,7 @@ import { app } from "../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function UpdateBlog() {
   const [blogFormData, setBlogFormData] = useState({
@@ -43,10 +44,10 @@ function UpdateBlog() {
         if (flag) {
           setBlogFormData(blog);
         } else {
-          console.log(error.errorMessage);
+          toast.error(error.errorMessage);
         }
       } catch (error) {
-        console.log(error.errorMessage);
+        toast.error(error.errorMessage);
       }
     };
     fetchBlog();
@@ -62,11 +63,9 @@ function UpdateBlog() {
 
   const handleFileUpload = async () => {
     if (!file) {
-      setFileUploadError("Please select an image");
+      toast.error("Please select an image");
       return;
     }
-
-    setFileUploadError(null);
 
     try {
       const storage = getStorage(app);
@@ -82,21 +81,19 @@ function UpdateBlog() {
           setFileUploadProgress(progress.toFixed(0));
         },
         (error) => {
-          setFileUploadError("Image upload failed");
+          toast.error("Image upload failed");
           setFileUploadProgress(null);
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setBlogFormData({ ...blogFormData, blogImage: downloadURL });
             setFileUploadProgress(null);
-            setFileUploadError(null);
           });
         }
       );
     } catch (error) {
-      console.log(error);
       setFileUploadProgress(null);
-      setFileUploadError("Image upload failed");
+      toast.error("Image upload failed");
     }
   };
 
@@ -117,14 +114,15 @@ function UpdateBlog() {
       setLoading(false);
 
       if (data.flag) {
-        console.log(data);
+        toast.success("Blog updated successfully");
         navigate(`/blog/${data.updatedBlog.slug}`);
       } else {
+        toast.error(data.errorMessage);
         setBlogUpdateError(data.errorMessage);
       }
     } catch (error) {
       setLoading(false);
-      setBlogUpdateError(error.errorMessage);
+      toast.error(error.errorMessage);
     }
   };
 

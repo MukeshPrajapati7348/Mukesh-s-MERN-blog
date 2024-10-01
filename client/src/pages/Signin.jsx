@@ -8,6 +8,7 @@ import {
   signInSuccess,
 } from "../redux/userReducer/userSlice";
 import GoogleOAuth from "../components/GoogleOAuth";
+import toast from "react-hot-toast";
 
 export default function Signin() {
   const [formData, setFormData] = useState({});
@@ -35,12 +36,15 @@ export default function Signin() {
       data = await data.json();
 
       if (data.flag) {
+        toast.success("Signed in successfully");
         dispatch(signInSuccess(data.brandingDetails));
         navigate("/");
       } else {
+        toast.error(data.errorMessage);
         dispatch(signInFailure(data.errorMessage));
       }
     } catch (error) {
+      toast.error(error.errorMessage);
       dispatch(signInFailure(error.errorMessage));
     }
   };
@@ -109,11 +113,6 @@ export default function Signin() {
                 Sign up
               </Link>
             </div>
-            {errorMessage && (
-              <Alert className="mt-5" color="failure">
-                {errorMessage}
-              </Alert>
-            )}
           </form>
         </div>
       </div>

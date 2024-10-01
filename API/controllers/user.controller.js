@@ -135,4 +135,19 @@ const getUsers = async (req, res, next) => {
   }
 };
 
-export { updateUser, deleteUser, userSignout, getUsers };
+const deleteOtherUser = async (req, res, next) => {
+  if (!req.user.isAdmin || req.user.id !== req.params.userId) {
+    return next(
+      errorHandler(403, "You are not authorized to delete this user")
+    );
+  }
+
+  try {
+    await User.findByIdAndDelete(req.params.userToDeleteId);
+    return res.status(200).json({ flag: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { updateUser, deleteUser, userSignout, getUsers, deleteOtherUser };
