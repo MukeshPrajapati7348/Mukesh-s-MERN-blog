@@ -6,7 +6,7 @@ function CallToAction() {
     <div className="p-3 flex flex-col sm:flex-row items-center justify-center border border-teal-500 rounded-tl-3xl rounded-br-3xl text-center">
       {/* left */}
       <div className="flex-1 flex justify-center flex-col">
-        <h2 className="text-2xl">Want to learn more about Javascript?</h2>
+        <h2 className="text-2xl">Want to learn about Javascript?</h2>
         <p className="text-gray-500 my-2">
           Checkout resources by W3schools.com
         </p>
