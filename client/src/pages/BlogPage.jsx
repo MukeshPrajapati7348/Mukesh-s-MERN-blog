@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useParams } from "react-router-dom";
 import { formatDate } from "../components/formatData";
+import CallToAction from "../components/CallToAction";
 
 function BlogPage() {
   const [blogData, setBlogData] = useState({});
@@ -65,6 +66,9 @@ function BlogPage() {
             dangerouslySetInnerHTML={{ __html: blogData.content }}
             className="w-full max-w-2xl mx-auto blogPage-content"
           ></div>
+          <div className="max-w-4xl w-full mx-auto">
+            <CallToAction />
+          </div>
         </main>
       )}
     </>
