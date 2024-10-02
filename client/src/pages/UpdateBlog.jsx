@@ -40,11 +40,11 @@ function UpdateBlog() {
     const fetchBlog = async () => {
       try {
         const res = await fetch(`/api/blog/getBlog/${blogId}`);
-        const { flag, blog } = await res.json();
+        const { flag, blog, errorMessage } = await res.json();
         if (flag) {
           setBlogFormData(blog);
         } else {
-          toast.error(error.errorMessage);
+          toast.error(errorMessage);
         }
       } catch (error) {
         toast.error(error.errorMessage);

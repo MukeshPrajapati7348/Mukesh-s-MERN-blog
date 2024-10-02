@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { Spinner } from "flowbite-react";
 import toast from "react-hot-toast";
+import { formatDate } from "./formatData";
 
 function DashboardBlogs() {
   const { currentUser } = useSelector((state) => state.user);
@@ -14,29 +15,6 @@ function DashboardBlogs() {
   const [showMore, setShowMore] = useState(true);
   const [showMoreLoading, setShowMoreLoading] = useState(false);
   const [deleteBlogId, setDeleteBlogId] = useState(-1);
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-
-  const formatDate = (updatedAt) => {
-    const updatedDate = new Date(updatedAt);
-    const month = updatedDate.getMonth();
-    const year = updatedDate.getFullYear();
-    const date = updatedDate.getDate();
-
-    return `${date < 10 ? "0" + date : date}-${months[month]}-${year}`;
-  };
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -107,9 +85,8 @@ function DashboardBlogs() {
   return (
     <>
       {loading ? (
-        <div className="w-full flex items-center justify-center">
+        <div className="w-full flex items-center justify-center min-h-screen">
           <Spinner color="pink" size="lg" />
-          <span className="text-lg ml-2">Loading...</span>
         </div>
       ) : (
         <div

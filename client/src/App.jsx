@@ -12,6 +12,7 @@ import CreateBlog from "./pages/CreateBlog";
 import AdminRoutes from "./components/AdminRoutes";
 import UpdateBlog from "./pages/UpdateBlog";
 import { Toaster } from "react-hot-toast";
+import BlogPage from "./pages/BlogPage";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           <Route path="/create-blog" element={<CreateBlog />} />
           <Route path="/update-blog/:blogId" element={<UpdateBlog />} />
         </Route>
+        <Route path="/blog/:blogSlug" element={<BlogPage />} />
       </Routes>
       <FooterComp />
     </BrowserRouter>
