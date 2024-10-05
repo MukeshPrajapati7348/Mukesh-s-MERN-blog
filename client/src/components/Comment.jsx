@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import moment from "moment";
-import { BiSolidLike, BiLike } from "react-icons/bi";
+import { FaThumbsUp } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
-function Comment({ comment }) {
+function Comment({ comment, onLike }) {
   const [user, setUser] = useState({});
+  const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -24,7 +26,7 @@ function Comment({ comment }) {
   }, [comment]);
 
   return (
-    <div className="flex gap-2 border-b dark:border-gray-600 mb-2">
+    <div className="flex gap-2  mb-5">
       <img
         src={user.profilePic}
         alt="user"
@@ -40,15 +42,29 @@ function Comment({ comment }) {
           </span>
         </div>
         <p className="text-gray-500 mb-2">{comment.content}</p>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <div className="flex items-center">
-            {/* <BiSolidLike /> */}
-            <BiLike className="cursor-pointer" />
-            <span className="ml-1">{comment.noOfLikes}</span>
+            <button
+              className={`cursor-pointer text-gray-500 hover:text-blue-500 text-sm ${
+                comment.likes.includes(currentUser && currentUser._id) &&
+                "!text-blue-500"
+              }`}
+              onClick={() => onLike(comment._id)}
+            >
+              <FaThumbsUp />
+            </button>
+
+            {comment.noOfLikes > 0 && (
+              <span className="ml-1 text-xs">
+                {comment.noOfLikes > 1
+                  ? comment.noOfLikes + " likes"
+                  : comment.noOfLikes + " like"}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
-            <span className="cursor-pointer">edit</span>
-            <span className="cursor-pointer">delete</span>
+            <button className="cursor-pointer">edit</button>
+            <button className="cursor-pointer">delete</button>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@ import { Button, Spinner, Textarea } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Comment from "./Comment";
 
 function CommentSection({ blogId }) {
@@ -10,6 +10,7 @@ function CommentSection({ blogId }) {
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
   const [comments, setComments] = useState([]);
+  const navigate = useNavigate();
 
   const handleCommentInput = (e) => {
     if (comment.length <= 200) {
@@ -65,6 +66,36 @@ function CommentSection({ blogId }) {
     };
     fetchComments();
   }, [blogId]);
+
+  const handleLike = async (commentId) => {
+    if (!currentUser) {
+      return navigate("/sign-in");
+    }
+    try {
+      let data = await fetch(`/api/comment/likeComment/${commentId}`, {
+        method: "put",
+      });
+      data = await data.json();
+
+      if (data.flag) {
+        setComments(
+          comments.map((comment) =>
+            comment._id === commentId
+              ? {
+                  ...comment,
+                  likes: data.comment.likes,
+                  noOfLikes: data.comment.noOfLikes,
+                }
+              : comment
+          )
+        );
+      } else {
+        toast.error(data.errorMessage);
+      }
+    } catch (error) {
+      toast.error(error.errorMessage);
+    }
+  };
 
   return (
     <div>
@@ -130,6 +161,7 @@ function CommentSection({ blogId }) {
                 comment={comment}
                 currentUser={currentUser}
                 key={comment._id}
+                onLike={handleLike}
               />
             ))}
           </div>
