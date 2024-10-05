@@ -2,6 +2,7 @@ import express from "express";
 import { verifyToken } from "../utils/user.verification.js";
 import {
   deleteUser,
+  getUser,
   getUsers,
   updateUser,
   userSignout,
@@ -14,5 +15,6 @@ router.delete("/delete/:userId", verifyToken, deleteUser);
 router.post("/signout", userSignout);
 router.get("/getUsers", verifyToken, getUsers);
 router.delete("/delete-users/:userId", verifyToken, deleteUser);
+router.get("/:userId", getUser);
 
 export default router;

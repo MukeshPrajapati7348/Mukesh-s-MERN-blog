@@ -17,3 +17,15 @@ export const createComment = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getBlogComments = async (req, res, next) => {
+  try {
+    const comments = await Comment.find({ blogId: req.params.blogId }).sort({
+      createdAt: -1,
+    });
+
+    return res.status(200).json({ flag: true, comments });
+  } catch (error) {
+    next(error);
+  }
+};
