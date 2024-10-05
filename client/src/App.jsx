@@ -13,11 +13,13 @@ import AdminRoutes from "./components/AdminRoutes";
 import UpdateBlog from "./pages/UpdateBlog";
 import { Toaster } from "react-hot-toast";
 import BlogPage from "./pages/BlogPage";
+import ScrollToTheTop from "./components/ScrollToTheTop";
 
 function App() {
   return (
     <BrowserRouter>
       <Header />
+      <ScrollToTheTop />
       <Toaster containerClassName="go4109123758" />
       <Routes>
         <Route path="/" element={<Home />} />

@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { Link, useParams } from "react-router-dom";
 import { formatDate } from "../components/formatData";
 import CallToAction from "../components/CallToAction";
+import CommentSection from "../components/CommentSection";
 
 function BlogPage() {
   const [blogData, setBlogData] = useState({});
@@ -64,10 +65,13 @@ function BlogPage() {
           </div>
           <div
             dangerouslySetInnerHTML={{ __html: blogData.content }}
-            className="w-full max-w-2xl mx-auto blogPage-content"
+            className="w-full max-w-2xl mx-auto blogPage-content mb-7"
           ></div>
           <div className="max-w-4xl w-full mx-auto">
             <CallToAction />
+          </div>
+          <div className="w-full max-w-2xl mx-auto my-5">
+            <CommentSection blogId={blogData._id} />
           </div>
         </main>
       )}
