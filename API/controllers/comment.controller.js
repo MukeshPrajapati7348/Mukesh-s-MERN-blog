@@ -52,3 +52,46 @@ export const likeComment = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateComment = async (req, res, next) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId);
+    if (!comment) {
+      return next(errorHandler(404, "Comment does not exist"));
+    }
+
+    if (!req.user.isAdmin && req.user.id !== comment.userId) {
+      return next(
+        errorHandler(403, "You are not authorized to update this comment")
+      );
+    }
+
+    comment.content = req.body.content;
+    await comment.save();
+
+    return res.status(200).json({ flag: true, comment });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteComment = async (req, res, next) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId);
+    if (!comment) {
+      return next(errorHandler(404, "Comment does not exist"));
+    }
+
+    if (!req.user.isAdmin && req.user.id !== comment.userId) {
+      return next(
+        errorHandler(403, "You are not authorized to update this comment")
+      );
+    }
+
+    await Comment.findByIdAndDelete(req.params.commentId);
+
+    return res.status(200).json({ flag: true });
+  } catch (error) {
+    next(error);
+  }
+};

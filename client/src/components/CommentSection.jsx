@@ -12,12 +12,6 @@ function CommentSection({ blogId }) {
   const [comments, setComments] = useState([]);
   const navigate = useNavigate();
 
-  const handleCommentInput = (e) => {
-    if (comment.length <= 200) {
-      setComment(e.target.value);
-    }
-  };
-
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -97,6 +91,57 @@ function CommentSection({ blogId }) {
     }
   };
 
+  const handleUpdate = async (commentId, content) => {
+    if (!currentUser) {
+      return navigate("/sign-in");
+    }
+    try {
+      let data = await fetch(`/api/comment/update/${commentId}`, {
+        method: "put",
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify({ content }),
+      });
+      data = await data.json();
+
+      if (data.flag) {
+        setComments(
+          comments.map((comment) =>
+            comment._id === commentId
+              ? {
+                  ...comment,
+                  content: data.comment.content,
+                }
+              : comment
+          )
+        );
+      } else {
+        toast.error(data.errorMessage);
+      }
+    } catch (error) {
+      toast.error(error.errorMessage);
+    }
+  };
+
+  const handleDelete = async (commentId) => {
+    if (!currentUser) {
+      return navigate("/sign-in");
+    }
+    try {
+      let data = await fetch(`/api/comment/delete/${commentId}`, {
+        method: "delete",
+      });
+      data = await data.json();
+
+      if (data.flag) {
+        setComments(comments.filter((comment) => comment._id !== commentId));
+      } else {
+        toast.error(data.errorMessage);
+      }
+    } catch (error) {
+      toast.error(error.errorMessage);
+    }
+  };
+
   return (
     <div>
       {currentUser ? (
@@ -130,7 +175,7 @@ function CommentSection({ blogId }) {
             maxLength="200"
             placeholder="Add a comment..."
             value={comment}
-            onChange={handleCommentInput}
+            onChange={() => setComment(e.target.value)}
           />
           <div className="flex justify-between items-center mt-3">
             <p className="text-xs text-gray-500">
@@ -162,6 +207,8 @@ function CommentSection({ blogId }) {
                 currentUser={currentUser}
                 key={comment._id}
                 onLike={handleLike}
+                onUpdate={handleUpdate}
+                onDelete={handleDelete}
               />
             ))}
           </div>
