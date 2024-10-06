@@ -5,11 +5,12 @@ import { Link, useParams } from "react-router-dom";
 import { formatDate } from "../components/formatData";
 import CallToAction from "../components/CallToAction";
 import CommentSection from "../components/CommentSection";
+import BlogCard from "../components/BlogCard";
 
 function BlogPage() {
   const [blogData, setBlogData] = useState({});
   const [loading, setLoading] = useState(false);
-  const [noOfMinsOfRead, setNoOfMinsOfRead] = useState(0);
+  const [recentBlogs, setRecentBlogs] = useState([]);
   const { blogSlug } = useParams();
 
   useEffect(() => {
@@ -32,6 +33,22 @@ function BlogPage() {
     };
     fetchBlog();
   }, [blogSlug]);
+
+  useEffect(() => {
+    const fetchRecentBlogs = async () => {
+      try {
+        const res = await fetch(`/api/blog/getBlogs?limit=3`);
+        const { blogs } = await res.json();
+        if (res.ok) {
+          setRecentBlogs(blogs);
+        }
+      } catch (error) {
+        toast.error(error.errorMessage);
+      }
+    };
+
+    fetchRecentBlogs();
+  }, []);
 
   return (
     <>
@@ -73,6 +90,16 @@ function BlogPage() {
           <div className="w-full max-w-2xl mx-auto my-5">
             <CommentSection blogId={blogData._id} />
           </div>
+          {recentBlogs.length > 0 && (
+            <div className="flex flex-col items-center justify-center mb-7">
+              <h1 className="text-xl text-center mb-4">Recent Blogs</h1>
+              <div className="flex flex-wrap justify-center gap-5">
+                {recentBlogs.map((blog) => (
+                  <BlogCard blog={blog} key={blog._id} />
+                ))}
+              </div>
+            </div>
+          )}
         </main>
       )}
     </>
