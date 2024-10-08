@@ -175,7 +175,7 @@ function CommentSection({ blogId }) {
             maxLength="200"
             placeholder="Add a comment..."
             value={comment}
-            onChange={() => setComment(e.target.value)}
+            onChange={(e) => setComment(e.target.value)}
           />
           <div className="flex justify-between items-center mt-3">
             <p className="text-xs text-gray-500">

@@ -4,6 +4,7 @@ import DashboardSidebar from "../components/DashboardSidebar";
 import DashboardProfile from "../components/DashboardProfile";
 import DashboardBlogs from "../components/DashboardBlogs";
 import DashboardUsers from "../components/DashboardUsers";
+import DashboardComp from "../components/DashboardComp";
 
 export default function Dashboard() {
   const [tab, setTab] = useState("");
@@ -29,6 +30,8 @@ export default function Dashboard() {
       {tab === "blogs" && <DashboardBlogs />}
       {/* users */}
       {tab === "users" && <DashboardUsers />}
+      {/* Dashboar data */}
+      {(tab === "dashboard" || !tab) && <DashboardComp />}
     </div>
   );
 }

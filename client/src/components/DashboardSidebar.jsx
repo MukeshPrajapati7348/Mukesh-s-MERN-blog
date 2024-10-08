@@ -3,6 +3,7 @@ import { Sidebar } from "flowbite-react";
 import { Link, useLocation } from "react-router-dom";
 import {
   HiArrowSmRight,
+  HiChartPie,
   HiDocumentText,
   HiUser,
   HiUsers,
@@ -12,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 
 function DashboardSidebar() {
-  const [tab, setTab] = useState("");
+  const [tab, setTab] = useState(null);
   const location = useLocation();
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
@@ -46,6 +47,17 @@ function DashboardSidebar() {
     <Sidebar className="w-full md:w-56">
       <Sidebar.Items>
         <Sidebar.ItemGroup className="flex flex-col gap-1">
+          {currentUser.isAdmin && (
+            <Link to="/dashboard?tab=dashboard">
+              <Sidebar.Item
+                active={tab === "dashboard" || !tab}
+                icon={HiChartPie}
+                as="div"
+              >
+                Dashboard
+              </Sidebar.Item>
+            </Link>
+          )}
           <Link to="/dashboard?tab=profile">
             <Sidebar.Item
               active={tab === "profile"}
