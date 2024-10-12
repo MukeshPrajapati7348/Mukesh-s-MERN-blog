@@ -3,8 +3,8 @@ import React from "react";
 export default function Projects() {
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="max-w-4xl flex flex-wrap justify-center gap-10">
-        <div className="w-96 border border-teal-500 hover:border-2 p-5 rounded-md flex flex-col gap-4 hover:scale-110 transition-all duration-300">
+      <div className="max-w-4xl flex flex-wrap justify-center gap-10 p-5">
+        <div className="w-96 border border-teal-500 p-5 rounded-md flex flex-col gap-4 hover:scale-105 transition-all duration-300">
           <h1 className="text-2xl">
             ListLogic{" "}
             <a
@@ -24,7 +24,7 @@ export default function Projects() {
             professional use.
           </p>
         </div>
-        <div className="w-96 border border-teal-500 hover:border-2 p-5 rounded-md flex flex-col gap-4 hover:scale-110 transition-all duration-300">
+        <div className="w-96 border border-teal-500 p-5 rounded-md flex flex-col gap-4 hover:scale-105 transition-all duration-300">
           <h1 className="text-2xl">
             ClearSkies{" "}
             <a
@@ -45,7 +45,7 @@ export default function Projects() {
           helps users plan activities and stay prepared for weather changes. */}
           </p>
         </div>
-        <div className="w-96 border border-teal-500 hover:border-2 p-5 rounded-md flex flex-col gap-4 hover:scale-110 transition-all duration-300">
+        <div className="w-96 border border-teal-500 p-5 rounded-md flex flex-col gap-4 hover:scale-105 transition-all duration-300">
           <h1 className="text-2xl">
             Portfolio{" "}
             <a
