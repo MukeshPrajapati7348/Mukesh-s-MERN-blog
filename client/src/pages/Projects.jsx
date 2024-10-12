@@ -2,7 +2,10 @@ import React from "react";
 
 export default function Projects() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex flex-col items-center justify-center">
+      <h1 className="text-center text-2xl font-semibold pb-1 px-3 border-gray-700 border-b-2">
+        Personal Projects
+      </h1>
       <div className="max-w-4xl flex flex-wrap justify-center gap-10 p-5">
         <div className="w-96 border border-teal-500 p-5 rounded-md flex flex-col gap-4 hover:scale-105 transition-all duration-300">
           <h1 className="text-2xl">
