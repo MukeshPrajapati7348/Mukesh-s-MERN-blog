@@ -1,7 +1,8 @@
-import { Button, Select, TextInput, Toast } from "flowbite-react";
+import { Button, Select, TextInput } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import BlogCard from "../components/BlogCard";
+import toast from "react-hot-toast";
 
 function Search() {
   const [searchData, setSearchData] = useState({
@@ -48,7 +49,7 @@ function Search() {
         }
       } catch (error) {
         setLoading(false);
-        Toast.error(error.errorMessage);
+        toast.error(error.errorMessage);
       }
     };
 
@@ -98,7 +99,7 @@ function Search() {
       }
     } catch (error) {
       setLoading(false);
-      Toast.error(error.errorMessage);
+      toast.error(error.errorMessage);
     }
   };
 
@@ -122,7 +123,7 @@ function Search() {
       }
     } catch (error) {
       setLoading(false);
-      Toast.error(error.errorMessage);
+      toast.error(error.errorMessage);
     }
   };
 
