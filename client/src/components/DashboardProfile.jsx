@@ -21,6 +21,7 @@ import {
 } from "../redux/userReducer/userSlice.js";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function DashboardProfile() {
   const { currentUser } = useSelector((state) => state.user);
@@ -30,13 +31,9 @@ function DashboardProfile() {
     profilePic: currentUser.profilePic,
   });
   const [userImageFile, setUserImageFile] = useState(null);
-  const [imageUploading, setImageUploading] = useState(null);
-  const [userUpdateSuccess, setUserUpdateSuccess] = useState(null);
-  const [userUpdateNoChange, setUserUpdateNoChange] = useState(null);
   const [userImageURL, setUserImageURL] = useState(null);
   const [openModal, setOpenModal] = useState(null);
   const [fileUploadProgress, setFileUploadProgress] = useState(null);
-  const [fileUploadError, setFileUploadError] = useState(null);
   const { loading, error: errorMessage } = useSelector((state) => state.user);
   const fileRef = useRef();
   const dispatch = useDispatch();
@@ -70,8 +67,7 @@ function DashboardProfile() {
     //     }
     //   }
     // }
-    setImageUploading("Please wait until image upload completed");
-    setFileUploadError(null);
+    toast.error("Please wait until image upload completed");
     const storage = getStorage(app);
     const fileName = new Date().getTime() + userImageFile.name;
     const storageRef = ref(storage, fileName);
@@ -84,18 +80,16 @@ function DashboardProfile() {
         setFileUploadProgress(progress.toFixed(0));
       },
       (error) => {
-        setFileUploadProgress(null);
-        setFileUploadError("Could not upload the image (size can be max 2MB)");
+        toast.error("Could not upload the image (size can be max 2MB)");
         setUserImageFile(null);
         setUserImageURL(null);
-        setImageUploading(null);
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          toast.success("File uploaded successfully");
           setUserImageURL(downloadURL);
           setUserDetails({ ...userDetails, profilePic: downloadURL });
           setUserImageFile(null);
-          setImageUploading(null);
         });
       }
     );
@@ -119,11 +113,9 @@ function DashboardProfile() {
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
-    setUserUpdateSuccess(null);
-    setUserUpdateNoChange(null);
 
     if (!checkUserDetailsChange()) {
-      setUserUpdateNoChange("No changes to update");
+      toast.error("No changes to update");
       return;
     }
     dispatch(updateUserStart());
@@ -140,12 +132,14 @@ function DashboardProfile() {
       data = await data.json();
 
       if (data.flag) {
-        setUserUpdateSuccess("User updated successfully");
+        toast.success("User updated successfully");
         dispatch(updateUserSuccess(data.userDetails));
       } else {
+        toast.error(data.errorMessage);
         dispatch(updateUserFailure(data.errorMessage));
       }
     } catch (error) {
+      toast.error(error.errorMessage);
       dispatch(updateUserFailure(error.errorMessage));
     }
   };
@@ -162,12 +156,15 @@ function DashboardProfile() {
       data = await data.json();
 
       if (data.flag) {
+        toast.success("Profile deleted successfully");
         dispatch(deleteUserSuccess());
         navigate("/sign-in");
       } else {
+        toast.error(data.errorMessage);
         dispatch(deleteUserFailure(data.errorMessage));
       }
     } catch (error) {
+      toast.error(error.errorMessage);
       dispatch(deleteUserFailure(error.errorMessage));
     }
   };
@@ -181,10 +178,11 @@ function DashboardProfile() {
       data = await data.json();
 
       if (data.flag) {
+        toast.success("Signed out successfully");
         dispatch(SignoutUserSuccess());
       }
     } catch (error) {
-      console.log(error);
+      toast.error(error.errorMessage);
     }
   };
 
@@ -231,8 +229,6 @@ function DashboardProfile() {
           />
         </div>
         <div className="flex flex-col gap-4 my-6">
-          {fileUploadError && <Alert color="failure">{fileUploadError}</Alert>}
-
           <TextInput
             type="text"
             placeholder="username"
@@ -285,16 +281,6 @@ function DashboardProfile() {
           Sign Out
         </span>
       </div>
-      {errorMessage && (
-        <Alert color="failure" className="mb-1">
-          {errorMessage}
-        </Alert>
-      )}
-      {userUpdateSuccess && <Alert color="success">{userUpdateSuccess}</Alert>}
-      {userUpdateNoChange && (
-        <Alert color="failure">{userUpdateNoChange}</Alert>
-      )}
-      {imageUploading && <Alert color="failure">{imageUploading}</Alert>}
 
       <Modal
         show={openModal}

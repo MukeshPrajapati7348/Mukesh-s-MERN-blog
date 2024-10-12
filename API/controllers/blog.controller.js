@@ -88,4 +88,46 @@ const deleteBlog = async (req, res, next) => {
   }
 };
 
-export { createBlog, getBlogs, deleteBlog };
+const getBlog = async (req, res, next) => {
+  try {
+    const blog = await Blog.findById(req.params.blogId);
+    return res.status(200).json({ flag: true, blog });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateBlog = async (req, res, next) => {
+  if (!req.user.isAdmin || req.user.id !== req.params.userId) {
+    return next(errorHandler(403, "You are not allowed to update this blog"));
+  }
+
+  const { title, content } = req.body;
+
+  if (!title || !title.trim() || !content || !content.trim()) {
+    return next(errorHandler(400, "Please fill all the fields"));
+  }
+
+  req.body.title = req.body.title.trim();
+  req.body.content = req.body.content.trim();
+
+  try {
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      req.params.blogId,
+      {
+        $set: {
+          title: req.body.title,
+          content: req.body.content,
+          blogImage: req.body.blogImage,
+          category: req.body.category,
+        },
+      },
+      { new: true }
+    );
+    return res.status(200).json({ flag: true, updatedBlog });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { createBlog, getBlogs, deleteBlog, getBlog, updateBlog };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Button,
@@ -18,15 +18,40 @@ import {
 import { app } from "../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
-function CreateBlog() {
-  const [blogFormData, setBlogFormData] = useState({});
+function UpdateBlog() {
+  const [blogFormData, setBlogFormData] = useState({
+    title: "",
+    content: "",
+    blogImage: "",
+    category: "",
+  });
   const [file, setFile] = useState(null);
   const [fileUploadProgress, setFileUploadProgress] = useState(null);
+  const [fileUploadError, setFileUploadError] = useState(null);
+  const [blogUpdateError, setBlogUpdateError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { blogId } = useParams();
+
+  useEffect(() => {
+    const fetchBlog = async () => {
+      try {
+        const res = await fetch(`/api/blog/getBlog/${blogId}`);
+        const { flag, blog, errorMessage } = await res.json();
+        if (flag) {
+          setBlogFormData(blog);
+        } else {
+          toast.error(errorMessage);
+        }
+      } catch (error) {
+        toast.error(error.errorMessage);
+      }
+    };
+    fetchBlog();
+  }, [blogId]);
 
   const handleChange = (e) => {
     setBlogFormData({ ...blogFormData, [e.target.name]: e.target.value });
@@ -68,27 +93,32 @@ function CreateBlog() {
       );
     } catch (error) {
       setFileUploadProgress(null);
-      toast.error(error);
+      toast.error("Image upload failed");
     }
   };
 
   const handleBlogSubmit = async (e) => {
     e.preventDefault();
+
     setLoading(true);
     try {
-      let data = await fetch("/api/blog/create", {
-        method: "post",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(blogFormData),
-      });
+      let data = await fetch(
+        `/api/blog/updateBlog/${blogFormData._id}/${blogFormData.userId}`,
+        {
+          method: "put",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(blogFormData),
+        }
+      );
       data = await data.json();
       setLoading(false);
 
       if (data.flag) {
-        toast.success("Blog created successfully");
-        navigate(`/blog/${data.blog.slug}`);
+        toast.success("Blog updated successfully");
+        navigate(`/blog/${data.updatedBlog.slug}`);
       } else {
         toast.error(data.errorMessage);
+        setBlogUpdateError(data.errorMessage);
       }
     } catch (error) {
       setLoading(false);
@@ -98,7 +128,7 @@ function CreateBlog() {
 
   return (
     <div className=" p-3 max-w-2xl mx-auto min-h-screen">
-      <h1 className="text-center text-3xl font-sembold my-8">Create Blog</h1>
+      <h1 className="text-center text-3xl font-sembold my-8">Update Blog</h1>
       <form className="flex flex-col gap-4" onSubmit={handleBlogSubmit}>
         <div className="flex flex-col gap-4 sm:flex-row justify-between">
           <TextInput
@@ -107,9 +137,15 @@ function CreateBlog() {
             required
             name="title"
             className="flex-1"
+            value={blogFormData.title}
             onChange={handleChange}
           />
-          <Select name="category" required onChange={handleChange}>
+          <Select
+            name="category"
+            required
+            onChange={handleChange}
+            value={blogFormData.category}
+          >
             <option value="uncatatorized">Select a category</option>
             <option value="javascript">Javascript</option>
             <option value="react">React</option>
@@ -142,6 +178,7 @@ function CreateBlog() {
             )}
           </Button>
         </div>
+        {fileUploadError && <Alert color="failure">{fileUploadError}</Alert>}
         {blogFormData.blogImage && (
           <img
             src={blogFormData.blogImage}
@@ -153,6 +190,7 @@ function CreateBlog() {
           theme="snow"
           placeholder="Write about the blog in brief here..."
           name="content"
+          value={blogFormData.content}
           onChange={handleQuillChange}
           className="h-64 mb-12"
           required
@@ -164,12 +202,17 @@ function CreateBlog() {
               <span className="ml-2">Loading...</span>
             </>
           ) : (
-            "Create"
+            "Update"
           )}
         </Button>
       </form>
+      {blogUpdateError && (
+        <Alert color="failure" className="mt-4">
+          {blogUpdateError}
+        </Alert>
+      )}
     </div>
   );
 }
 
-export default CreateBlog;
+export default UpdateBlog;

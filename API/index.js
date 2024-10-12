@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import userRouter from "./routes/user.routes.js";
 import authRouter from "./routes/auth.routes.js";
 import blogRouter from "./routes/Blog.routes.js";
+import commentRouter from "./routes/comment.routes.js";
 import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -31,6 +32,7 @@ mongoose
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/blog", blogRouter);
+app.use("/api/comment", commentRouter);
 
 //midleware to hance errors
 app.use((error, req, res, next) => {

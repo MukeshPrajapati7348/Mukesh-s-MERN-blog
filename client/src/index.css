@@ -9,3 +9,39 @@ body {
 .ql-editor {
     font-size: 1.05rem;
 }
+
+.blogPage-content p {
+    margin:1rem 0;
+}
+
+
+.blogPage-content h1 {
+    font-size:  1.5rem;
+    margin: 1.2rem 0;
+}
+
+.blogPage-content h2 {
+    font-size: 1.4rem;
+    margin: 1.1rem 0;
+}
+
+.blogPage-content a {
+    text-decoration: none;
+    color: hsla(212,100%,48%,1) !important;  
+    padding: 0 0.2rem ;
+}
+
+.dark .blogPage-content a {
+    color:  red !important;
+}
+
+.blogPage-content a:hover {
+    text-decoration: underline;
+}
+
+.blogPage-content code {
+    background-color: rgb(121, 121, 121) !important;
+    color:#fff !important;
+    padding: 0 0.2rem !important;
+    border-radius: 0.5rem;
+}

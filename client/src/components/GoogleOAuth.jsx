@@ -6,6 +6,7 @@ import { app } from "../firebase";
 import { useDispatch } from "react-redux";
 import { signInFailure, signInSuccess } from "../redux/userReducer/userSlice";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function GoogleOAuth() {
   const auth = getAuth(app);
@@ -31,12 +32,15 @@ function GoogleOAuth() {
       data = await data.json();
 
       if (data.flag) {
+        toast.success("Signed in successfully");
         dispatch(signInSuccess(data.brandingDetails));
         navigate("/");
       } else {
+        toast.error(data.errorMessage);
         dispatch(signInFailure(data.errorMessage));
       }
     } catch (error) {
+      toast.error(error);
       dispatch(signInFailure(error.errorMessage));
     }
   };

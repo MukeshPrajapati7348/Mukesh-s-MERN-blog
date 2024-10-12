@@ -8,6 +8,7 @@ import {
   signInSuccess,
 } from "../redux/userReducer/userSlice";
 import GoogleOAuth from "../components/GoogleOAuth";
+import toast from "react-hot-toast";
 
 export default function Signup() {
   const [formData, setFormData] = useState({});
@@ -27,21 +28,24 @@ export default function Signup() {
 
     try {
       dispatch(signInStart());
-      let response = await fetch("/api/auth/sign-up", {
+      let data = await fetch("/api/auth/sign-up", {
         method: "post",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(formData),
       });
-      response = await response.json();
+      data = await data.json();
 
-      if (response.flag) {
+      if (data.flag) {
+        toast.success("Registered successfully");
         dispatch(signInSuccess(null));
         navigate("/sign-in");
       } else {
-        dispatch(signInFailure(response.errorMessage));
+        toast.error(data.errorMessage);
+        dispatch(signInFailure(data.errorMessage));
       }
     } catch (error) {
-      dispatch(signInFailure(response.errorMessage));
+      toast.error(error.errorMessage);
+      dispatch(signInFailure(error.errorMessage));
     }
   };
 
@@ -121,11 +125,6 @@ export default function Signup() {
                 Sign in
               </Link>
             </div>
-            {errorMessage && (
-              <Alert className="mt-5" color="failure">
-                {errorMessage}
-              </Alert>
-            )}
           </form>
         </div>
       </div>

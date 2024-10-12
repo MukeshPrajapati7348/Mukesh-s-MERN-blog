@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Button, Modal, Table } from "flowbite-react";
-import { Link } from "react-router-dom";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { Spinner } from "flowbite-react";
+import { FaCheck, FaTimes } from "react-icons/fa";
+import { toast } from "react-hot-toast";
 
-function Blogs() {
+function DashboardUsers() {
   const { currentUser } = useSelector((state) => state.user);
-  const [blogs, setBlogs] = useState([]);
+  const [users, setUsers] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showMore, setShowMore] = useState(true);
   const [showMoreLoading, setShowMoreLoading] = useState(false);
-  const [deleteBlogId, setDeleteBlogId] = useState(-1);
+  const [deleteUserId, setDeleteUserId] = useState(-1);
   const months = [
     "Jan",
     "Feb",
@@ -34,70 +35,68 @@ function Blogs() {
     const year = updatedDate.getFullYear();
     const date = updatedDate.getDate();
 
-    return `${date}-${months[month]}-${year}`;
+    return `${date < 10 ? "0" + date : date}-${months[month]}-${year}`;
   };
 
   useEffect(() => {
-    const fetchBlogs = async () => {
+    const fetchUsers = async () => {
       try {
         setLoading(true);
-        let fetchedBlogs = await fetch(
-          `/api/blog/getBlogs?userId=${currentUser._id}`
-        );
-        fetchedBlogs = await fetchedBlogs.json();
+        const res = await fetch("/api/user/getUsers");
+        const { flag, users } = await res.json();
         setLoading(false);
-        setBlogs(fetchedBlogs.blogs);
-        if (fetchedBlogs.blogs.length < 9) {
-          setShowMore(false);
+
+        if (flag) {
+          setUsers(users);
+          if (users.length < 9) {
+            setShowMore(false);
+          }
         }
       } catch (error) {
-        console.log(error.errorMessage);
+        setLoading(false);
+        toast.error(error.errorMessage);
       }
     };
-    fetchBlogs();
+    fetchUsers();
   }, [currentUser._id]);
 
   const handleShowMore = async () => {
     try {
       setShowMoreLoading(true);
-      const res = await fetch(
-        `/api/blog/getBlogs?userId=${currentUser._id}&startIndex=${blogs.length}`
-      );
-      const { blogs: moreBlogs } = await res.json();
+      const res = await fetch(`/api/user/getUsers?startIndex=${users.length}`);
+      const { flag, users: moreUsers } = await res.json();
       setShowMoreLoading(false);
 
-      if (res.ok) {
-        setBlogs((prev) => [...prev, ...moreBlogs]);
+      if (flag) {
+        setUsers((prev) => [...prev, ...moreUsers]);
 
-        if (moreBlogs.length < 9) {
+        if (moreUsers.length < 9) {
           setShowMore(false);
         }
       }
     } catch (error) {
-      console.log(error.errorMessage);
+      setShowMoreLoading(false);
+      toast.error(error.errorMessage);
     }
   };
 
-  const handleBlogDelete = async () => {
+  const handleUserDelete = async () => {
     setOpenModal(false);
 
     try {
-      let data = await fetch(
-        `/api/blog/delete/${deleteBlogId}/${currentUser._id}`,
-        {
-          method: "delete",
-        }
-      );
-      data = await data.json();
+      const data = await fetch(`/api/user/delete-users/${deleteUserId}`, {
+        method: "delete",
+      });
+      const { flag, errorMessage } = await data.json();
 
-      if (data.flag) {
-        setBlogs((prev) => prev.filter((blog) => blog._id !== deleteBlogId));
-        console.log("Blog deleted successfully", blogs);
+      if (flag) {
+        toast.success("User deleted successfully");
+        setUsers((prev) => prev.filter((user) => user._id !== deleteUserId));
       } else {
-        console.log(error.errorMessage);
+        toast.error(errorMessage);
       }
     } catch (error) {
-      console.log(error.errorMessage);
+      toast.error(error.errorMessage);
     }
   };
 
@@ -105,7 +104,7 @@ function Blogs() {
     <>
       {loading ? (
         <div className="w-full flex items-center justify-center">
-          <Spinner color="pink" size="xl" />
+          <Spinner color="pink" size="lg" />
           <span className="text-lg ml-2">Loading...</span>
         </div>
       ) : (
@@ -113,68 +112,56 @@ function Blogs() {
           className="p-3 table-auto overflow-x-auto md:mx-auto scrollbar scrollbar-track-slate-100
     scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500"
         >
-          {currentUser.isAdmin && blogs.length > 0 ? (
+          {currentUser.isAdmin && users.length > 0 ? (
             <Table hoverable className="shadow-md">
               <Table.Head>
-                <Table.HeadCell>Updated date</Table.HeadCell>
-                <Table.HeadCell>Blog image</Table.HeadCell>
-                <Table.HeadCell>Blog title</Table.HeadCell>
-                <Table.HeadCell>Category</Table.HeadCell>
+                <Table.HeadCell> Date created </Table.HeadCell>
+                <Table.HeadCell>User image</Table.HeadCell>
+                <Table.HeadCell>Username</Table.HeadCell>
+                <Table.HeadCell>Email</Table.HeadCell>
+                <Table.HeadCell>Admin</Table.HeadCell>
                 <Table.HeadCell>Delete</Table.HeadCell>
-                <Table.HeadCell>
-                  <span className="sr-only">Edit</span>
-                </Table.HeadCell>
               </Table.Head>
               <Table.Body className="divide-y">
-                {blogs.map((blog) => (
+                {users.map((user) => (
                   <Table.Row
                     className="bg-white dark:border-gray-700 dark:bg-gray-800"
-                    key={blog._id}
+                    key={user._id}
                   >
-                    <Table.Cell>{formatDate(blog.updatedAt)}</Table.Cell>
+                    <Table.Cell>{formatDate(user.createdAt)}</Table.Cell>
                     <Table.Cell>
-                      <Link to={`/blog/${blog.slug}`}>
-                        <img
-                          src={blog.blogImage}
-                          alt="image"
-                          className="w-20 h-10 object-cover bg-gray-500"
-                        />
-                      </Link>
+                      <img
+                        src={user.profilePic}
+                        alt="image"
+                        className="w-10 h-10 object-cover bg-gray-500 rounded-full"
+                      />
                     </Table.Cell>
+                    <Table.Cell>{user.username}</Table.Cell>
+                    <Table.Cell>{user.email}</Table.Cell>
                     <Table.Cell>
-                      <Link
-                        className="font-medium text-gray-900 dark:text-white"
-                        to={`/blog/${blog.slug}`}
-                      >
-                        {blog.title}
-                      </Link>
+                      {user.isAdmin ? (
+                        <FaCheck className="text-green-500" />
+                      ) : (
+                        <FaTimes className="text-red-500" />
+                      )}
                     </Table.Cell>
-                    <Table.Cell>{blog.category}</Table.Cell>
                     <Table.Cell>
                       <span
                         className="font-medium text-red-500 cursor-pointer"
                         onClick={() => {
                           setOpenModal(true);
-                          setDeleteBlogId(blog._id);
+                          setDeleteUserId(user._id);
                         }}
                       >
                         delete
                       </span>
-                    </Table.Cell>
-                    <Table.Cell>
-                      <Link
-                        to={`/blog/${blog._id}`}
-                        className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
-                      >
-                        Edit
-                      </Link>
                     </Table.Cell>
                   </Table.Row>
                 ))}
               </Table.Body>
             </Table>
           ) : (
-            <p>No blog found!</p>
+            <p>No user found!</p>
           )}
           {showMore && (
             <div className="w-full flex items-center justify-center py-5">
@@ -204,10 +191,10 @@ function Blogs() {
               <div className="text-center">
                 <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
                 <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                  Are you sure you want to delete this blog?
+                  Are you sure you want to delete this user?
                 </h3>
                 <div className="flex justify-center gap-4">
-                  <Button color="failure" onClick={handleBlogDelete}>
+                  <Button color="failure" onClick={handleUserDelete}>
                     {"Yes, I'm sure"}
                   </Button>
                   <Button color="gray" onClick={() => setOpenModal(false)}>
@@ -223,4 +210,4 @@ function Blogs() {
   );
 }
 
-export default Blogs;
+export default DashboardUsers;
