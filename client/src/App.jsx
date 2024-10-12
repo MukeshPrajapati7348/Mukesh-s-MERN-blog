@@ -14,6 +14,7 @@ import UpdateBlog from "./pages/UpdateBlog";
 import { Toaster } from "react-hot-toast";
 import BlogPage from "./pages/BlogPage";
 import ScrollToTheTop from "./components/ScrollToTheTop";
+import Search from "./pages/Search";
 
 function App() {
   return (
@@ -30,11 +31,12 @@ function App() {
         <Route path="/sign-up" element={<Signup />} />
         <Route path="/sign-in" element={<Signin />} />
         <Route path="/projects" element={<Projects />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/blog/:blogSlug" element={<BlogPage />} />
         <Route element={<AdminRoutes />}>
           <Route path="/create-blog" element={<CreateBlog />} />
           <Route path="/update-blog/:blogId" element={<UpdateBlog />} />
         </Route>
-        <Route path="/blog/:blogSlug" element={<BlogPage />} />
       </Routes>
       <FooterComp />
     </BrowserRouter>

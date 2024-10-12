@@ -1,5 +1,5 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Avatar, Button, Dropdown, Navbar, TextInput } from "flowbite-react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FaMoon, FaSun } from "react-icons/fa";
@@ -12,6 +12,17 @@ export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
   const { theme } = useSelector((state) => state.theme);
   const dispatch = useDispatch();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchText, setSearchText] = useState("");
+
+  useEffect(() => {
+    const URLParams = new URLSearchParams(location.search);
+    const searchVal = URLParams.get("searchText");
+    if (searchVal) {
+      setSearchText(searchVal);
+    }
+  }, [location.search]);
 
   const handleUserSignout = async () => {
     try {
@@ -29,6 +40,14 @@ export default function Header() {
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const URLParams = new URLSearchParams(location.search);
+    URLParams.set("searchText", searchText);
+    const searchString = URLParams.toString();
+    navigate(`search?${searchString}`);
+  };
+
   return (
     <Navbar className="border-b-2">
       <Link
@@ -44,12 +63,14 @@ export default function Header() {
         Blog
       </Link>
 
-      <form>
+      <form onSubmit={handleSubmit}>
         <TextInput
           type="text"
           placeholder="Search here..."
           rightIcon={AiOutlineSearch}
           className="hidden lg:inline"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
         />
       </form>
       <Button className="w-12 h-10 lg:hidden" color="gray">
