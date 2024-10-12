@@ -7,10 +7,13 @@ import commentRouter from "./routes/comment.routes.js";
 import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import path from "path";
 
 //Dotenv configuration for later use
 dotenv.config();
 const port = process.env.PORT || 3000;
+
+const __dirname = path.resolve();
 
 //Creating app
 const app = express();
@@ -33,6 +36,12 @@ app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/blog", blogRouter);
 app.use("/api/comment", commentRouter);
+
+app.use(express.static(path.join(__dirname, "/client/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
+});
 
 //midleware to hance errors
 app.use((error, req, res, next) => {
