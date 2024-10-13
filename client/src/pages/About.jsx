@@ -3,7 +3,7 @@ import React from "react";
 export default function About() {
   return (
     <div className="min-h-screen flex justify-center items-center">
-      <div className="max-w-2xl p-5 border border-teal-500 rounded-md rounded-tl-3xl rounded-br-3xl">
+      <div className="max-w-2xl p-5 m-2 border border-teal-500 rounded-md rounded-tl-3xl rounded-br-3xl">
         <h1 className="text-3xl font-semibold my-2">About Mukesh's Blog</h1>
         <div className="text-gray-500 flex flex-col gap-6 text-md">
           <p>

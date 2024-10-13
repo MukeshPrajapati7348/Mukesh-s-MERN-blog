@@ -68,18 +68,18 @@ export default function Header() {
           type="text"
           placeholder="Search here..."
           rightIcon={AiOutlineSearch}
-          className="hidden lg:inline"
+          className="hidden sm:inline"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
         />
       </form>
-      <Button className="w-12 h-10 lg:hidden" color="gray">
+      {/* <Button className="w-12 h-10 lg:hidden" color="gray">
         <AiOutlineSearch />
-      </Button>
+      </Button> */}
 
       <div className="flex gap-2 md:order-2">
         <Button
-          className="w-12 h-10 hidden sm:inline"
+          className="w-12 h-10"
           color="gray"
           onClick={() => dispatch(toggleTheme())}
         >
