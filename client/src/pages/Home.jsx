@@ -46,7 +46,7 @@ export default function Home() {
             <h1 className="text-2xl text-center mb-4 font-bold">
               Recent Blogs
             </h1>
-            <div className="flex flex-wrap justify-center gap-5">
+            <div className="flex flex-wrap justify-center gap-5 p-2">
               {recentBlogs.map((blog) => (
                 <BlogCard blog={blog} key={blog._id} />
               ))}
