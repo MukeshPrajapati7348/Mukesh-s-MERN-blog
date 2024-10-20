@@ -86,26 +86,11 @@ export default function Header() {
           {theme === "light" ? <FaMoon /> : <FaSun />}{" "}
         </Button>
         {!currentUser ? (
-          <>
-            <Link to="/sign-in">
-              <Button
-                gradientDuoTone="purpleToBlue"
-                outline
-                className="text-lg"
-              >
-                Sign in
-              </Button>
-            </Link>
-            <Link to="/sign-up" className="text-lg">
-              <Button
-                gradientDuoTone="purpleToPink"
-                outline
-                className="text-lg"
-              >
-                Sign up
-              </Button>
-            </Link>
-          </>
+          <Link to="/sign-in">
+            <Button gradientDuoTone="purpleToBlue" outline className="text-lg">
+              Sign in
+            </Button>
+          </Link>
         ) : (
           <Dropdown
             arrowIcon={false}
